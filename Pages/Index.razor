@@ -1,0 +1,76 @@
+﻿@page "/"
+
+
+
+<h3 class="text-center my-3">Bienvenido al Cine XYZ</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Próximas Películas</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var pelicula in ProximasPeliculas)
+                    {
+                        <li class="list-group-item">@pelicula.Titulo - @pelicula.Duracion</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Salas Disponibles</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var sala in SalasDisponibles)
+                    {
+                        <li class="list-group-item">Sala @sala.Numero - Capacidad: @sala.Capacidad</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-header {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+
+    .list-group-item {
+        border: none;
+        font-size: 16px;
+    }
+</style>
+@code {
+    // Simulación de datos para la página de inicio
+    List<Pelicula> ProximasPeliculas = new List<Pelicula>
+    {
+        new Pelicula { Titulo = "Pelicula 1", Duracion = "2h 30min" },
+        new Pelicula { Titulo = "Pelicula 2", Duracion = "1h 45min" },
+        new Pelicula { Titulo = "Pelicula 3", Duracion = "2h 10min" }
+    };
+
+    List<Sala> SalasDisponibles = new List<Sala>
+    {
+        new Sala { Numero = 101, Capacidad = 150 },
+        new Sala { Numero = 102, Capacidad = 120 },
+        new Sala { Numero = 201, Capacidad = 100 },
+        new Sala { Numero = 202, Capacidad = 90 },
+        new Sala { Numero = 301, Capacidad = 80 }
+    };
+
+    public class Pelicula
+    {
+        public string Titulo { get; set; }
+        public string Duracion { get; set; }
+    }
+
+    public class Sala
+    {
+        public int Numero { get; set; }
+        public int Capacidad { get; set; }
+    }
+
+}
