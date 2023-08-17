@@ -1,0 +1,75 @@
+﻿@page "/pelicula"
+
+@using System.Data;
+@using PruebaRossell.DbManager;  
+@inject ClassCarga ClassCarga;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime IJSRuntime
+
+<button type="button" @onclick="AddPelicula" class="btn btn-primary btn-lg"> + Agregar Película </button>
+
+<div class="col-12">
+    <div class="table-responsive">
+        <table class="table table-responsive-sm table-bordered">
+            <thead>
+                <tr>
+                    @foreach (DataColumn column in dt.Columns)
+                    {
+                        <th>@column.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow row in dt.Rows)
+                {
+                    <tr>
+                        @foreach (DataColumn col in dt.Columns)
+                        {
+                            @if (col.ColumnName == "Editar")
+                            {
+                                <td><a class="btn primary-blue" @onclick="@(() => EditPelicula(row["PeliculaId"].ToString()))">Editar</a></td>
+                            }
+                            else if (col.ColumnName == "Eliminar")
+                            {
+                                <td><a class="btn primary-blue" @onclick="@(() => DeletePelicula(row["PeliculaId"].ToString()))">Borrar</a></td>
+                            }
+                            else
+                            {
+                                <td>@row[col.ColumnName].ToString()</td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<h1>@msg</h1>
+
+@code {
+    DataTable dt = new DataTable();
+    string msg = "";
+
+    protected async override Task OnInitializedAsync()
+    {
+        dt = await ClassCarga.Peliculas();
+    }
+
+    private void AddPelicula()
+    {
+        NavigationManager.NavigateTo("/FormPelicula/0");
+    }
+
+    private async Task EditPelicula(string peliculaId)
+    {
+        msg = "Editar";
+        NavigationManager.NavigateTo("/FormPelicula/" + peliculaId);
+    }
+
+    private async Task DeletePelicula(string peliculaId)
+    {
+        var res = await ClassCarga.DeletePelicula(peliculaId);
+        NavigationManager.NavigateTo("/pelicula", forceLoad: true);
+    }
+}

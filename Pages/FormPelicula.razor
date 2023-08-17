@@ -1,0 +1,87 @@
+﻿@page "/FormPelicula/{id}"
+
+@using System;
+@using System.Globalization;
+@using System.Threading.Tasks;
+@using System.Data;
+@using PruebaRossell.DbManager;
+@inject ClassCarga ClassCarga;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime IJSRuntime
+
+<h2>Formulario de Película</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-6 col-sm-4">
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Título</label>
+                <input type="text" class="form-control" @bind-value="Titulo" id="titulo" placeholder="Ingrese el título de la película">
+            </div>
+        </div>
+
+        <div class="col-6 col-sm-4">
+            <div class="mb-3">
+                <label for="duracion" class="form-label">Duración (HH:mm)</label>
+                <input type="text" class="form-control" @bind-value="DuracionText" id="duracion" placeholder="Ingrese la duración de la película">
+            </div>
+        </div>
+    </div>
+
+    <button type="button" @onclick="SaveRecord" class="btn btn-success btn-lg">Guardar</button>
+    <button type="button" @onclick="Back" class="btn btn-danger btn-lg">Regresar</button>
+</div>
+
+@code {
+    [Parameter]
+    public string? id { get; set; }
+
+    public string? Titulo = string.Empty;
+    public string? DuracionText = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id != "0")
+        {
+            var dt = await ClassCarga.GetPeliculaById(id);
+            Titulo = dt.Rows[0]["Titulo"].ToString();
+            DuracionText = dt.Rows[0]["Duracion"].ToString();
+        }
+    }
+
+
+    private async Task SaveRecord()
+    {
+        DateTime now = DateTime.Now;
+
+        // Convierte el valor de duración en horas y minutos
+        string[] duracionParts = DuracionText.Split(':');
+        if (duracionParts.Length == 2 && int.TryParse(duracionParts[0], out int horas) && int.TryParse(duracionParts[1], out int minutos))
+        {
+            TimeSpan duracion = new TimeSpan(horas, minutos, 0);
+
+            if (id == "0")
+            {
+                var dt = await ClassCarga.InsertPelicula(Titulo, duracion, now);
+
+                NavigationManager.NavigateTo("/pelicula");
+            }
+            else
+            {
+                var dt = await ClassCarga.UpdatePelicula(id,Titulo, duracion, now);
+
+                NavigationManager.NavigateTo("/pelicula");
+            }
+
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/pelicula");
+        
+        }
+    }
+
+    private async Task Back()
+    {
+        NavigationManager.NavigateTo("/pelicula");
+    }
+}
